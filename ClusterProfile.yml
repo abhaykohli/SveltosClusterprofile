@@ -1,0 +1,37 @@
+apiVersion: config.projectsveltos.io/v1beta1
+kind: ClusterProfile
+metadata:
+  name: deploy-nginx-templated
+spec:
+  clusterSelector:
+    matchExpressions:
+    - key: env
+      operator: In
+      values:
+      - staging
+      - production
+  
+  syncMode: Continuous
+  
+  helmCharts:
+  - repositoryURL: https://charts.bitnami.com/bitnami
+    repositoryName: bitnami
+    chartName: bitnami/nginx
+    chartVersion: 22.3.2
+    releaseName: nginx
+    releaseNamespace: apps
+    helmChartAction: Install
+    values: |
+      replicaCount: {{ if eq .Cluster.metadata.labels.env "production" }}3{{ else }}1{{ end }}
+      
+      service:
+        type: ClusterIP
+      
+      # Different resources based on environment
+      resources:
+        requests:
+          cpu: {{ if eq .Cluster.metadata.labels.env "production" }}500m{{ else }}100m{{ end }}
+          memory: {{ if eq .Cluster.metadata.labels.env "production" }}512Mi{{ else }}128Mi{{ end }}
+        limits:
+          cpu: {{ if eq .Cluster.metadata.labels.env "production" }}1000m{{ else }}200m{{ end }}
+          memory: {{ if eq .Cluster.metadata.labels.env "production" }}1Gi{{ else }}256Mi{{ end }}
