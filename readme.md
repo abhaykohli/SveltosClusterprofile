@@ -119,7 +119,7 @@ kubectl --context kind-production get deployment -n apps nginx
 
 ### Phase 1: Setup Management Cluster
 
-#### 1.1 Create Management Cluster
+#### Create Management Cluster
 
 ```bash
 # Create management cluster
@@ -141,7 +141,7 @@ kubectl wait --for=condition=Available --timeout=300s \
   -n cert-manager deployment --all
 ```
 
-#### 1.3 Install Sveltos
+#### Install Sveltos
 
 ```bash
 # Add Sveltos Helm repository
@@ -165,13 +165,13 @@ kubectl wait --for=condition=Available --timeout=300s \
 kind create cluster --name staging
 ```
 
-#### 2.2 Create Production Cluster
+####  Create Production Cluster
 
 ```bash
 kind create cluster --name production
 ```
 
-#### 2.3 Verify Clusters
+#### Verify Clusters
 
 ```bash
 kind get clusters
@@ -186,18 +186,18 @@ sveltos-management
 
 ---
 
-### Phase 3: Setup Docker Networking
+### Phase 3: Setup Docker Networking required only if on WSL and using KIND skip if not using it !!
 
 This is **CRITICAL** for cluster-to-cluster communication.
 
-#### 3.1 Create Docker Network
+####  Create Docker Network
 
 ```bash
 # Create a custom bridge network
 docker network create sveltos-network
 ```
 
-#### 3.2 Connect All Clusters
+#### Connect All Clusters
 
 ```bash
 # Connect management cluster
@@ -210,7 +210,7 @@ docker network connect sveltos-network staging-control-plane
 docker network connect sveltos-network production-control-plane
 ```
 
-#### 3.3 Verify Network Connectivity
+####  Verify Network Connectivity
 
 ```bash
 # Check network connections
@@ -223,7 +223,7 @@ You should see all three control-plane containers listed.
 
 ### Phase 4: Register Workload Clusters
 
-#### 4.1 Generate Kubeconfigs with Internal IPs
+#### Generate Kubeconfigs with Internal IPs
 
 This is the **KEY STEP** for WSL2/Docker environments.
 
@@ -247,7 +247,7 @@ server: https://staging-control-plane:6443
 server: https://production-control-plane:6443
 ```
 
-#### 4.2 Register Clusters with Sveltos
+#### Register Clusters with Sveltos
 
 ```bash
 # Switch to management cluster
@@ -268,7 +268,7 @@ sveltosctl register cluster \
   --labels=env=production
 ```
 
-#### 4.3 Wait for Clusters to be READY
+####  Wait for Clusters to be READY
 
 ```bash
 # Watch cluster status (wait 1-2 minutes)
@@ -287,7 +287,7 @@ production   production   true    v1.34.0
 
 ### Phase 5: Deploy NGINX with Templating
 
-#### 5.1 Create ClusterProfile
+#### Create ClusterProfile
 
 ```bash
 cat > clusterprofile-nginx-templated.yaml <<'EOF'
@@ -336,13 +336,13 @@ spec:
 EOF
 ```
 
-#### 5.2 Apply ClusterProfile
+#### Apply ClusterProfile
 
 ```bash
 kubectl apply -f clusterprofile-nginx-templated.yaml
 ```
 
-#### 5.3 Monitor Deployment
+#### Monitor Deployment
 
 ```bash
 # Watch ClusterSummaries being created
@@ -356,7 +356,7 @@ staging      deploy-nginx-templated-staging-...    Provisioned
 production   deploy-nginx-templated-production-... Provisioned
 ```
 
-#### 5.4 Using sveltosctl for Better Visibility
+####  Using sveltosctl for Better Visibility
 
 ```bash
 # Show deployed addons
@@ -493,6 +493,7 @@ With --internal:
 The `--internal` flag makes Kind return addresses that work for **container-to-container** communication within Docker networks.
 
 ---
+Scripts/supported files are in repo!
 
 ## 📚 Additional Resources
 
