@@ -229,7 +229,8 @@ This is the **KEY STEP** for WSL2/Docker environments.
 
 ```bash
 # Get kubeconfigs with --internal flag
-# This provides container-resolvable addresses
+# This provides container-resolvable addresses 
+# Note: Use internal flag only when using WSL and Kind else skip this
 kind get kubeconfig --name staging --internal > /tmp/staging-kubeconfig
 kind get kubeconfig --name production --internal > /tmp/production-kubeconfig
 
